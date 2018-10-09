@@ -6,7 +6,8 @@ source VARCHAR(255) NOT NULL, language_code STRING NOT NULL, language_name VARCH
 trump INTEGER NOT NULL, canonical_name VARCHAR(255), language_family_root VARCHAR(255),              \
 language_family_genus VARCHAR(255), country VARCHAR(255), area VARCHAR(255), population INTEGER,     \
 latitude FLOAT, longitude FLOAT)
-phonemes (id INTEGER PRIMARY KEY, klass VARCHAR(255) NOT NULL, combined_klass VARCHAR(255) NOT NULL, \
+phonemes (id INTEGER PRIMARY KEY, phoneme VARCHAR(255) NOT NULL,                                     \
+klass VARCHAR(255) NOT NULL, combined_klass VARCHAR(255) NOT NULL,                                   \
 num_of_combined_glyphs VARCHAR(255) NOT NULL)
 language_phonemes (language_id INTEGER NOT NULL, phoneme_id INTEGER NOT NULL,                        \
 FOREIGN KEY(language_id) REFERENCES languages(id), FOREIGN KEY(phoneme_id) REFERENCES phonemes(id))
