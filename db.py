@@ -50,7 +50,7 @@ constricted_glottis VARCHAR(255), \
 fortis VARCHAR(255), \
 ejective VARCHAR(255), \
 implosive VARCHAR(255), \
-click VARCHAR(255) '''
+click VARCHAR(255))'''
 
 def init_db():
 	sqlite_db_path = './phoible.sqlite'
