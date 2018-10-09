@@ -25,37 +25,38 @@ def munge_key(k):
 	'''Replace CamelCase with snake_case and rename `class` to `klass` (in Class and CombinedClass).'''
 	return underscore(k).replace('class', 'klass')
 
-# LANGUAGE PROPERTIES:
-# InventoryID         - the ID of the source/language pair in PHOIBLE's database
-# Source              - the database PHOIBLE used as a source for the inventory
-# LanguageCode        - the ISO 639-(2? 3?) code for the language
-# LanguageName        - the name of the language
-# Trump               - holds the nth instance of the language in the DB (in case of multiple sources)
-langprops = {'InventoryID', 'Source', 'LanguageCode', 'LanguageName', 'Trump'}
-# PHONEME PROPERTIES:
-# PhonemeID           - the ID of the row (discard - not used anywhere else)
-# GlyphID             - the ID of the phoneme's IPA representation in PHOIBLE's DB (discard)
-# Phoneme             - the IPA representation of the phoneme
-# Class               - consonant, vowel, or tone
-# CombinedClass       - consonant, diacritic, vowel, etc.
-# NumOfCombinedGlyphs - number of codepoints comprising the IPA representation of the character
-phonprops = {'Phoneme', 'Class', 'CombinedClass', 'NumOfCombinedGlyphs'}
-
-with open('phoible-phonemes.tsv', encoding='utf-8') as f:
-	reader = csv.DictReader(f, delimiter='\t')
-	for row in reader:
-		# Add the inventory (language/source pair, mostly - there are a few dups IIRC) if it doesn't exist
-		lang_id = get_id('languages', 'inventory_id', row['InventoryID'])
-		if not lang_id:
-			print(row['LanguageName']) # good enough for a progress marker
-			insert('languages', dfilter(row, langprops))
-			lang_id = sql.lastrowid
-		# Now add the phoneme if it doesn't exist
-		phon_id = get_id('phonemes', 'phoneme', row['Phoneme'])
-		if not phon_id:
-			insert('phonemes', dfilter(row, phonprops))
-			phon_id = sql.lastrowid
-		# Now add the language/phoneme pair
-		insert('language_phonemes', OrderedDict({'language_id': lang_id, 'phoneme_id': phon_id}))
-
-conn.commit()
+if __name__ == '__main__':
+	# LANGUAGE PROPERTIES:
+	# InventoryID         - the ID of the source/language pair in PHOIBLE's database
+	# Source              - the database PHOIBLE used as a source for the inventory
+	# LanguageCode        - the ISO 639-(2? 3?) code for the language
+	# LanguageName        - the name of the language
+	# Trump               - holds the nth instance of the language in the DB (in case of multiple sources)
+	langprops = {'InventoryID', 'Source', 'LanguageCode', 'LanguageName', 'Trump'}
+	# PHONEME PROPERTIES:
+	# PhonemeID           - the ID of the row (discard - not used anywhere else)
+	# GlyphID             - the ID of the phoneme's IPA representation in PHOIBLE's DB (discard)
+	# Phoneme             - the IPA representation of the phoneme
+	# Class               - consonant, vowel, or tone
+	# CombinedClass       - consonant, diacritic, vowel, etc.
+	# NumOfCombinedGlyphs - number of codepoints comprising the IPA representation of the character
+	phonprops = {'Phoneme', 'Class', 'CombinedClass', 'NumOfCombinedGlyphs'}
+	
+	with open('phoible-phonemes.tsv', encoding='utf-8') as f:
+		reader = csv.DictReader(f, delimiter='\t')
+		for row in reader:
+			# Add the inventory (language/source pair, mostly - there are a few dups IIRC) if it doesn't exist
+			lang_id = get_id('languages', 'inventory_id', row['InventoryID'])
+			if not lang_id:
+				print(row['LanguageName']) # good enough for a progress marker
+				insert('languages', dfilter(row, langprops))
+				lang_id = sql.lastrowid
+			# Now add the phoneme if it doesn't exist
+			phon_id = get_id('phonemes', 'phoneme', row['Phoneme'])
+			if not phon_id:
+				insert('phonemes', dfilter(row, phonprops))
+				phon_id = sql.lastrowid
+			# Now add the language/phoneme pair
+			insert('language_phonemes', OrderedDict({'language_id': lang_id, 'phoneme_id': phon_id}))
+	
+	conn.commit()
