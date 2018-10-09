@@ -10,46 +10,47 @@ phonemes (id INTEGER PRIMARY KEY, phoneme VARCHAR(255) NOT NULL,                
 klass VARCHAR(255) NOT NULL, combined_klass VARCHAR(255) NOT NULL,                                   \
 num_of_combined_glyphs VARCHAR(255) NOT NULL)
 language_phonemes (language_id INTEGER NOT NULL, phoneme_id INTEGER NOT NULL,                        \
-FOREIGN KEY(language_id) REFERENCES languages(id), FOREIGN KEY(phoneme_id) REFERENCES phonemes(id))
+FOREIGN KEY(language_id) REFERENCES languages(id), FOREIGN KEY(phoneme_id) REFERENCES phonemes(id),  \
+UNIQUE (language_id, phoneme_id) ON CONFLICT REPLACE)
 segments (id INTEGER PRIMARY KEY, \
-segment VARCHAR(255) NOT NULL, \
-tone VARCHAR(255) NOT NULL, \
-stress VARCHAR(255) NOT NULL, \
-syllabic VARCHAR(255) NOT NULL, \
-short VARCHAR(255) NOT NULL, \
-long VARCHAR(255) NOT NULL, \
-consonantal VARCHAR(255) NOT NULL, \
-sonorant VARCHAR(255) NOT NULL, \
-continuant VARCHAR(255) NOT NULL, \
-delayed_release VARCHAR(255) NOT NULL, \
-approximant VARCHAR(255) NOT NULL, \
-tap VARCHAR(255) NOT NULL, \
-trill VARCHAR(255) NOT NULL, \
-nasal VARCHAR(255) NOT NULL, \
-lateral VARCHAR(255) NOT NULL, \
-labial VARCHAR(255) NOT NULL, \
-round VARCHAR(255) NOT NULL, \
-labiodental VARCHAR(255) NOT NULL, \
-coronal VARCHAR(255) NOT NULL, \
-anterior VARCHAR(255) NOT NULL, \
-distributed VARCHAR(255) NOT NULL, \
-strident VARCHAR(255) NOT NULL, \
-dorsal VARCHAR(255) NOT NULL, \
-high VARCHAR(255) NOT NULL, \
-low VARCHAR(255) NOT NULL, \
-front VARCHAR(255) NOT NULL, \
-back VARCHAR(255) NOT NULL, \
-tense VARCHAR(255) NOT NULL, \
-retracted_tongue_root VARCHAR(255) NOT NULL, \
-advanced_tongue_root VARCHAR(255) NOT NULL, \
-periodic_glottal_source VARCHAR(255) NOT NULL, \
-epilaryngeal_source VARCHAR(255) NOT NULL, \
-spread_glottis VARCHAR(255) NOT NULL, \
-constricted_glottis VARCHAR(255) NOT NULL, \
-fortis VARCHAR(255) NOT NULL, \
-ejective VARCHAR(255) NOT NULL, \
-implosive VARCHAR(255) NOT NULL, \
-click VARCHAR(255) NOT NULL)'''
+segment VARCHAR(255), \
+tone VARCHAR(255), \
+stress VARCHAR(255), \
+syllabic VARCHAR(255), \
+short VARCHAR(255), \
+long VARCHAR(255), \
+consonantal VARCHAR(255), \
+sonorant VARCHAR(255), \
+continuant VARCHAR(255), \
+delayed_release VARCHAR(255), \
+approximant VARCHAR(255), \
+tap VARCHAR(255), \
+trill VARCHAR(255), \
+nasal VARCHAR(255), \
+lateral VARCHAR(255), \
+labial VARCHAR(255), \
+round VARCHAR(255), \
+labiodental VARCHAR(255), \
+coronal VARCHAR(255), \
+anterior VARCHAR(255), \
+distributed VARCHAR(255), \
+strident VARCHAR(255), \
+dorsal VARCHAR(255), \
+high VARCHAR(255), \
+low VARCHAR(255), \
+front VARCHAR(255), \
+back VARCHAR(255), \
+tense VARCHAR(255), \
+retracted_tongue_root VARCHAR(255), \
+advanced_tongue_root VARCHAR(255), \
+periodic_glottal_source VARCHAR(255), \
+epilaryngeal_source VARCHAR(255), \
+spread_glottis VARCHAR(255), \
+constricted_glottis VARCHAR(255), \
+fortis VARCHAR(255), \
+ejective VARCHAR(255), \
+implosive VARCHAR(255), \
+click VARCHAR(255) '''
 
 def init_db():
 	sqlite_db_path = './phoible.sqlite'
