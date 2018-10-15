@@ -5,8 +5,9 @@ def build(term):
 			arr.append(f'segments.{k} = \'{term[k]}\'')
 			return ' AND '.join(arr)
 	elif isinstance(term, str):
-		return f'phonemes.phoneme = {term}'
+		return f'phonemes.phoneme LIKE \'{term}\''
 	else:
+		print(term)
 		raise 
 
 def contains_query(term, num=None, gtlt='='):
@@ -31,8 +32,9 @@ def contains_query(term, num=None, gtlt='='):
 	else:
 		num_cond = f'HAVING count(*) {gtlt} {num}'
 
-	search = f'''\
-	    SELECT languages.id, languages.language_name
+	return f'''\
+	    languages.id IN (
+	    SELECT languages.id
 		FROM languages
 		    JOIN language_phonemes ON languages.id = language_phonemes.language_id
 		    JOIN phonemes ON language_phonemes.phoneme_id = phonemes.id
@@ -40,19 +42,15 @@ def contains_query(term, num=None, gtlt='='):
 		    WHERE {term_cond}
 		    GROUP BY languages.id
 	        {num_cond}
-		;'''
-
-	return search
+		)'''
 
 def does_not_contain_query(term):
 	'''Generate a query for languages having no segments matching `term`.'''
 
 	term_cond = build(term)
 
-	search = f'''\
-	SELECT languages.id, languages.language_name
-	FROM languages
-	WHERE languages.id NOT IN
+	return f'''\
+	languages.id NOT IN
 		(SELECT languages.id
 		FROM languages
 			JOIN language_phonemes ON languages.id = language_phonemes.language_id
@@ -60,26 +58,50 @@ def does_not_contain_query(term):
 			JOIN segments ON phonemes.phoneme = segments.segment
 		WHERE {term_cond}
 		GROUP BY languages.id)
-	;'''
+	'''
 
-	return search
+class Query:
+	def __init__(self, contains=True, term='', num=None, gtlt='='):
+		self.term = term
+		self.contains = contains
+		if contains:
+			self.num = num
+			self.gtlt = gtlt
 
+def get_sql(query):
+	if query.contains:
+		return contains_query(query.term, query.num, query.gtlt)
+	else:
+		return does_not_contain_query(query.term)
+
+def search(*queries):
+	query_sqls = [get_sql(q) for q in queries]
+	return f'''\
+		SELECT languages.id, languages.language_name
+		FROM languages
+		WHERE {' AND '.join(query_sqls)}
+		;'''
 
 def p(a):
-	for line in a:
-		print(line[1])
+	res = sql.execute(a)
+	for line in res:
+		print(f'    {line[1]}')
 if __name__ == '__main__':
 	from db import init_db
 	conn, sql = init_db()
 	
 	print("More than 30 +round")
-	res = sql.execute(contains_query({'round': '+'}, 30, '>')).fetchall()
-	p(res)
+	q = Query(True, {'round': '+'}, 30, '>')
+	p(search(q))
 
 	print("No +round")
-	res = sql.execute(does_not_contain_query({'round': '+'}))
-	p(res)
+	q = Query(False, {'round': '+'})
+	p(search(q))
 
 	print("Two vowels")
-	res = sql.execute(contains_query({'syllabic': '+'}, 3, '<'))
-	p(res)
+	q = Query(True, {'syllabic': '+'}, 3, '<')
+	p(search(q))
+
+	print("/ʰd/ and no /m/")
+	q = [Query(False, 'm%'), Query(True, 'ʰd')]
+	p(search(*q))
