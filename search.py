@@ -1,4 +1,4 @@
-def build(term):
+def phoneme_condition(term):
 	if isinstance(term, dict):
 		arr = []
 		for k in term:
@@ -7,7 +7,6 @@ def build(term):
 	elif isinstance(term, str):
 		return f'phonemes.phoneme LIKE \'{term}\''
 	else:
-		print(term)
 		raise 
 
 def contains_query(term, num=None, gtlt='='):
@@ -25,7 +24,7 @@ def contains_query(term, num=None, gtlt='='):
 	- `gt`: Either `True` or `False`. If `True`, find languages with greater than `num` things;
 	    if false, find languages with exactly `num` things.
 	    '''
-	term_cond = build(term)
+	term_cond = phoneme_condition(term)
 
 	if num is None:
 		num_cond = ''
@@ -47,7 +46,7 @@ def contains_query(term, num=None, gtlt='='):
 def does_not_contain_query(term):
 	'''Generate a query for languages having no segments matching `term`.'''
 
-	term_cond = build(term)
+	term_cond = phoneme_condition(term)
 
 	return f'''\
 	languages.id NOT IN
@@ -68,18 +67,25 @@ class Query:
 			self.num = num
 			self.gtlt = gtlt
 
-def get_sql(query):
-	if query.contains:
-		return contains_query(query.term, query.num, query.gtlt)
-	else:
-		return does_not_contain_query(query.term)
+class QueryTree:
+	def __init__(self, left, relation, right):
+		self.l = left # left side of the query tree - a QueryTree or a Query
+		self.r = right # right side of the query tree
+		self.rel = relation # 'AND' or 'OR'
 
-def search(*queries):
-	query_sqls = [get_sql(q) for q in queries]
+def get_sql(q):
+	if isinstance(q, QueryTree):
+		return f'({get_sql(q.l)} {q.rel} {get_sql(q.r)})'
+	if q.contains:
+		return contains_query(q.term, q.num, q.gtlt)
+	else:
+		return does_not_contain_query(q.term)
+
+def search(qtree):
 	return f'''\
 		SELECT languages.id, languages.language_name
 		FROM languages
-		WHERE {' AND '.join(query_sqls)}
+		WHERE {get_sql(qtree)}
 		;'''
 
 def p(a):
@@ -99,9 +105,17 @@ if __name__ == '__main__':
 	p(search(q))
 
 	print("Two vowels")
-	q = Query(True, {'syllabic': '+'}, 3, '<')
+	q = Query(True, {'syllabic': '+'}, 2, '=')
 	p(search(q))
 
 	print("/ʰd/ and no /m/")
-	q = [Query(False, 'm%'), Query(True, 'ʰd')]
-	p(search(*q))
+	q = QueryTree(Query(False, 'm%'), 'AND', Query(True, 'ʰd'))
+	p(search(q))
+
+	print("No +round or two vowels")
+	q = QueryTree(Query(False, {'round': '+'}), 'OR', Query(True, {'syllabic': '+'}, 3, '<'))
+	p(search(q))
+
+	print("Two vowels or /ʰd/ and no /m/")
+	q = QueryTree(Query(True, {'syllabic': '+'}, 2, '='), 'OR', QueryTree(Query(False, 'm%'), 'AND', Query(True, 'ʰd')))
+	p(search(q))
