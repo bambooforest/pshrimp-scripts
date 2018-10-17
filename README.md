@@ -14,6 +14,10 @@ For example, `/t̪ʙ/` will return all doculects that contain the phoneme repres
 
 A *feature term* consists of a number (optionally preceded by a `<` or `>` sign), a space, and a string of pluses and minuses followed (with no intervening space) by the name of the feature to search. For example, `2 +coronal` will return all doculects with exactly two [+coronal] segments, and `>30 +syllabic` wil return all doculects with more than thirty vowels.
 
+For the numeric component of the feature term, `no` can be used to mean `0`, and `any` can be used to mean `+0`.
+
+To search for multiple feature values on the same phoneme, separate the feature components with a semicolon. For example, `any +syllabic;+consonantal` will return a list of doculects with syllabic consonants.
+
 Search terms may be joined by the logical operators `and` and `or`. These are postfix.
 
 ### Examples
