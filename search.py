@@ -3,7 +3,7 @@ def phoneme_condition(term):
 		arr = []
 		for k in term:
 			arr.append(f'segments.{k} = \'{term[k]}\'')
-			return ' AND '.join(arr)
+		return ' AND '.join(arr)
 	elif isinstance(term, str):
 		return f'phonemes.phoneme LIKE \'{term}\''
 	else:
