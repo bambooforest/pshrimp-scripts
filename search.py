@@ -63,9 +63,8 @@ class Query:
 	def __init__(self, contains=True, term='', num=None, gtlt='='):
 		self.term = term # either a dict of {feature: value} or a string representing a phoneme
 		self.contains = contains
-		if contains:
-			self.num = num
-			self.gtlt = gtlt
+		self.num = num
+		self.gtlt = gtlt
 
 class QueryTree:
 	def __init__(self, left, relation, right):
@@ -76,7 +75,7 @@ class QueryTree:
 def get_sql(q):
 	if hasattr(q, 'l'):
 		return f'({get_sql(q.l)} {q.rel} {get_sql(q.r)})'
-	if q.contains:
+	if q.contains or q.gtlt == '>':
 		return contains_query(q.term, q.num, q.gtlt)
 	else:
 		return does_not_contain_query(q.term)
