@@ -15,7 +15,7 @@ class ParserError(Exception):
 	pass
 
 def is_qualifier(s):
-	return re.match('^[<>]?[0-9]+$', s) or s == 'no'
+	return re.match('^[<>]?[0-9]+$', s) or s in ['no','any']
 def is_qualificand(s):
 	return re.match('[+-]+[a-z_]+', s.replace(',',''))
 def is_phoneme(s):
@@ -26,6 +26,8 @@ def is_conjunction(s):
 def parse_qualifier(s):
 	if s == 'no':
 		return (None, 0)
+	elif s == 'any':
+		return ('>', 0)
 	gtlt = None
 	if s[0] in ['<','>']:
 		gtlt = s[0]
