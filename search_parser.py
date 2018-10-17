@@ -36,10 +36,13 @@ def parse_phoneme(s):
 	return s.replace('/','')
 def parse_qualificand(s):
 	s = s.replace(',','')
-	feature_vals = re.match('[+-]+', s)
-	feature_vals = ','.join(feature_vals.group().split(' '))
-	feature = re.search('[a-z_]+', s).group()
-	return (feature_vals, feature)
+	term = {}
+	for section in s.split(';'):
+		feature_vals = re.match('[+-]+', section)
+		feature_vals = ','.join(feature_vals.group().split(' '))
+		feature = re.search('[a-z_]+', section).group()
+		term[feature] = feature_vals
+	return term
 
 def parse(s):
 	'''Parse a search string. 
@@ -59,9 +62,10 @@ def parse(s):
 	The word 'no' is treated as a synonym for '0'. If the qualificand is a phoneme, no qualifier
 	is necessary.
 
-	A *qualificand* consists of a phoneme or a feature value. Phonemes are wrapped in /slashes/.
-	Feature values consist of the characters + and -, optionally joined by commas. (For example,
-	+,-sonorant is treated identically to +-sonorant.)
+	A *qualificand* consists of a phoneme or a feature. Phonemes are wrapped in /slashes/.
+	Features are preceded by values, which consist of the characters + and -, optionally 
+	joined by commas. (For example, +,-sonorant is treated identically to +-sonorant.) 
+	To search for multiple features in the same qualificand, separate them with a semicolon.
 
 	There are two *conjunctions*, 'and' and 'or'. These use postfix notation!
 	'''
@@ -74,8 +78,8 @@ def parse(s):
 		if is_qualifier(curr):
 			gtlt, num = parse_qualifier(tokens.next())
 			if is_qualificand(tokens.peek()):
-				feature_vals, feature = parse_qualificand(tokens.next())
-				query_stack.append(Query(contains=num>0, term={feature: feature_vals}, num=num, gtlt=gtlt or '='))
+				term = parse_qualificand(tokens.next())
+				query_stack.append(Query(contains=num>0, term=term, num=num, gtlt=gtlt or '='))
 			elif is_phoneme(tokens.peek()):
 				phoneme = parse_phoneme(tokens.next())
 				query_stack.append(Query(contains=num>0, term=phoneme))
