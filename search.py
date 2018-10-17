@@ -61,7 +61,7 @@ def does_not_contain_query(term):
 
 class Query:
 	def __init__(self, contains=True, term='', num=None, gtlt='='):
-		self.term = term
+		self.term = term # either a dict of {feature: value} or a string representing a phoneme
 		self.contains = contains
 		if contains:
 			self.num = num
@@ -74,7 +74,7 @@ class QueryTree:
 		self.rel = relation # 'AND' or 'OR'
 
 def get_sql(q):
-	if isinstance(q, QueryTree):
+	if hasattr(q, 'l'):
 		return f'({get_sql(q.l)} {q.rel} {get_sql(q.r)})'
 	if q.contains:
 		return contains_query(q.term, q.num, q.gtlt)
@@ -88,34 +88,12 @@ def search(qtree):
 		WHERE {get_sql(qtree)}
 		;'''
 
-def p(a):
-	res = sql.execute(a)
-	for line in res:
-		print(f'    {line[1]}')
 if __name__ == '__main__':
 	from db import init_db
+	from search_parser import parse
+	import sys
 	conn, sql = init_db()
-	
-	print("More than 30 +round")
-	q = Query(True, {'round': '+'}, 30, '>')
-	p(search(q))
-
-	print("No +round")
-	q = Query(False, {'round': '+'})
-	p(search(q))
-
-	print("Two vowels")
-	q = Query(True, {'syllabic': '+'}, 2, '=')
-	p(search(q))
-
-	print("/ʰd/ and no /m/")
-	q = QueryTree(Query(False, 'm%'), 'AND', Query(True, 'ʰd'))
-	p(search(q))
-
-	print("No +round or two vowels")
-	q = QueryTree(Query(False, {'round': '+'}), 'OR', Query(True, {'syllabic': '+'}, 3, '<'))
-	p(search(q))
-
-	print("Two vowels or /ʰd/ and no /m/")
-	q = QueryTree(Query(True, {'syllabic': '+'}, 2, '='), 'OR', QueryTree(Query(False, 'm%'), 'AND', Query(True, 'ʰd')))
-	p(search(q))
+	s = search(parse(sys.argv[1]))
+	res = sql.execute(s)
+	for line in res:
+		print(line[1])
