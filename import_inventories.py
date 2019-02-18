@@ -3,15 +3,13 @@ import csv
 from inflection import underscore
 from collections import OrderedDict
 
-conn, sql = init_db()
-
-def get_id(table, field, value):
+def get_id(table, field, value, sql):
 	'''Get (assumed to be unique) id of the thing in `table` where `field` = `value`.'''
 	# NB: Passing table/column names as parameters doesn't work. This does not appear to be documented.
 	res = sql.execute('SELECT id FROM {} WHERE {} = ?'.format(table, field), (value,)).fetchone()
 	return res[0] if res else False
 
-def insert(table, props):
+def insert(table, props, sql):
 	'''Insert OrderedDict `props` into `table`.'''
 	s = 'INSERT INTO {} ({}) VALUES ({})'.format(table, ','.join(props.keys()), ','.join([f':{val}' for val in props.keys()]))
 	sql.execute(s, tuple(props[k] for k in props))
@@ -26,6 +24,7 @@ def munge_key(k):
 	return underscore(k).replace('class', 'klass')
 
 if __name__ == '__main__':
+	conn, sql = init_db()
 	# LANGUAGE PROPERTIES:
 	# InventoryID         - the ID of the source/language pair in PHOIBLE's database
 	# Source              - the database PHOIBLE used as a source for the inventory
@@ -46,17 +45,17 @@ if __name__ == '__main__':
 		reader = csv.DictReader(f, delimiter='\t')
 		for row in reader:
 			# Add the inventory (language/source pair, mostly - there are a few dups IIRC) if it doesn't exist
-			lang_id = get_id('languages', 'inventory_id', row['InventoryID'])
+			lang_id = get_id('languages', 'inventory_id', row['InventoryID'], sql)
 			if not lang_id:
 				print(row['LanguageName']) # good enough for a progress marker
-				insert('languages', dfilter(row, langprops))
+				insert('languages', dfilter(row, langprops), sql)
 				lang_id = sql.lastrowid
 			# Now add the phoneme if it doesn't exist
-			phon_id = get_id('phonemes', 'phoneme', row['Phoneme'])
+			phon_id = get_id('phonemes', 'phoneme', row['Phoneme'], sql)
 			if not phon_id:
-				insert('phonemes', dfilter(row, phonprops))
+				insert('phonemes', dfilter(row, phonprops), sql)
 				phon_id = sql.lastrowid
 			# Now add the language/phoneme pair
-			insert('language_phonemes', OrderedDict({'language_id': lang_id, 'phoneme_id': phon_id}))
+			insert('language_phonemes', OrderedDict({'language_id': lang_id, 'phoneme_id': phon_id}), sql)
 	
 	conn.commit()
