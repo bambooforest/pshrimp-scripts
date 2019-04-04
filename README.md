@@ -2,7 +2,16 @@
 
 The scripts in this repo use Python 3 and depend on `sqlite3`.
 
+## Additions to the data
+
+Two languages lacking Glottocodes in the canonical PHOIBLE 2.0 release are given Glottocodes here.
+
+- 2281 Modern Aramaic (EA) is assigned `lish1247`, as the source is about the Amadiya dialect of Lishana Deni.
+- 2729 Djindewal (ER), an alternate name for Jandai, is assigned `yaga1256`.
+
 ## Search
+
+(With the PHOIBLE 2 release, this is somewhat outdated. It'll be fixed later.)
 
 Use `search.py` to search PHOIBLE. 
 
