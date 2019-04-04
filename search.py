@@ -5,7 +5,7 @@ def phoneme_condition(term):
 			arr.append(f'segments.{k} = \'{term[k]}\'')
 		return ' AND '.join(arr)
 	elif isinstance(term, str):
-		return f'phonemes.phoneme LIKE \'{term}\''
+		return f'segments.phoneme LIKE \'{term}\''
 	else:
 		raise 
 
@@ -32,14 +32,13 @@ def contains_query(term, num=None, gtlt='='):
 		num_cond = f'HAVING count(*) {gtlt} {num}'
 
 	return f'''\
-	    languages.id IN (
-	    SELECT languages.id
-		FROM languages
-		    JOIN language_phonemes ON languages.id = language_phonemes.language_id
-		    JOIN phonemes ON language_phonemes.phoneme_id = phonemes.id
-		    JOIN segments ON phonemes.phoneme = segments.segment
+	    doculects.id IN (
+	    SELECT doculects.id
+		FROM doculects
+			JOIN doculect_segments ON doculects.id = doculect_segments.doculect_id
+			JOIN segments ON doculect_segments.segment_id = segments.id
 		    WHERE {term_cond}
-		    GROUP BY languages.id
+		    GROUP BY doculects.id
 	        {num_cond}
 		)'''
 
@@ -49,14 +48,13 @@ def does_not_contain_query(term):
 	term_cond = phoneme_condition(term)
 
 	return f'''\
-	languages.id NOT IN
-		(SELECT languages.id
-		FROM languages
-			JOIN language_phonemes ON languages.id = language_phonemes.language_id
-			JOIN phonemes ON language_phonemes.phoneme_id = phonemes.id
-			JOIN segments ON phonemes.phoneme = segments.segment
+	doculects.id NOT IN
+		(SELECT doculects.id
+		FROM doculects
+			JOIN doculect_segments ON doculects.id = doculect_segments.doculect_id
+			JOIN segments ON doculect_segments.segment_id = segments.id
 		WHERE {term_cond}
-		GROUP BY languages.id)
+		GROUP BY doculects.id)
 	'''
 
 class Query:
@@ -82,8 +80,8 @@ def get_sql(q):
 
 def search(qtree):
 	return f'''\
-		SELECT languages.id, languages.language_name
-		FROM languages
+		SELECT doculects.id, doculects.language_name
+		FROM doculects
 		WHERE {get_sql(qtree)}
 		;'''
 
