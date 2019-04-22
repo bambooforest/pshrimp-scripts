@@ -86,7 +86,7 @@ def search(qtree):
 		;'''
 
 if __name__ == '__main__':
-	from db import init_db
+	from db_sqlite import init_db
 	from search_parser import parse
 	import sys
 	conn, sql = init_db()
