@@ -9,6 +9,12 @@ Two languages lacking Glottocodes in the canonical PHOIBLE 2.0 release are given
 - 2281 Modern Aramaic (EA) is assigned `lish1247`, as the source is about the Amadiya dialect of Lishana Deni.
 - 2729 Djindewal (ER), an alternate name for Jandai, is assigned `yaga1256`.
 
+Three languages with obsolete Glottocodes have been reassigned here.
+
+- 2728 Jandai (ER): `jand1248` -> `yaga1256`
+- 2730 Turubul (ER): `yaga1248` -> `yaga1256`
+- 2731 Yagara (ER): `yaga1248` -> `yaga1256`
+
 ## Search
 
 (With the PHOIBLE 2 release, this is somewhat outdated. It'll be fixed later.)
