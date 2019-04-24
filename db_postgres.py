@@ -16,11 +16,20 @@ languages (                                 \
     iso6393 VARCHAR(255),                   \
     family VARCHAR(255),                    \
     genus VARCHAR(255),                     \
-    country VARCHAR(255),                   \
     area VARCHAR(255),                      \
-    population INTEGER,                     \
     latitude FLOAT,                         \
     longitude FLOAT                         \
+)
+countries (                               \
+    id VARCHAR(255) PRIMARY KEY,          \
+    name VARCHAR(255) NOT NULL            \
+)
+languages_countries (                                  \
+    language_id INTEGER NOT NULL,                      \
+    country_id VARCHAR(255) NOT NULL,                  \
+    FOREIGN KEY(language_id) REFERENCES languages(id), \
+    FOREIGN KEY(country_id) REFERENCES countries(id),  \
+    UNIQUE(language_id, country_id)                    \
 )
 segments (                                \
     id SERIAL PRIMARY KEY,                \
@@ -88,6 +97,7 @@ def init_db():
     build_schema = [f'CREATE TABLE IF NOT EXISTS {table}' for table in schema.split('\n')]
     for t in build_schema:
         sql.execute(t)
+    conn.commit()
     return (conn, sql)
 
 if __name__ == '__main__':

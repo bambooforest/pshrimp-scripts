@@ -5,14 +5,14 @@ import csv
 
 conn, sql = init_db()
 
-def get_id(table, field, value):
+def get_id(table, field, value, sql = sql):
     '''Get (assumed to be unique) id of the thing in `table` where `field` = `value`. Returns False if it's not there.'''
     # NB: Passing table/column names as parameters doesn't work. This does not appear to be documented.
     sql.execute('SELECT id FROM {} WHERE {} = %s'.format(table, field), (value,))
     res = sql.fetchone()
     return res[0] if res else None
 
-def insert(table, props, return_id = True):
+def insert(table, props, return_id = True, sql = sql):
     '''Insert OrderedDict `props` ({col_name: prop}) into `table`.'''
     # ON CONFLICT REPLACE for allophones - looks like there's a lot of dups.
     s = 'INSERT INTO {} ({}) VALUES ({}) ON CONFLICT DO NOTHING'.format(table, ','.join(props.keys()), ','.join([f'%({val})s' for val in props.keys()]))
@@ -25,9 +25,9 @@ def dfilter(d, keys):
     Also munge them so they fit nicely in the DB.'''
     return OrderedDict((munge_key(k), munge_value(v)) for k, v in d.items() if munge_key(k) in keys)
 
-def dinsert(table, d, keys):
+def dinsert(table, d, keys, sql = sql):
     '''dfilter, then insert'''
-    insert(table, dfilter(d, keys))
+    insert(table, dfilter(d, keys), sql = sql)
 
 def munge_key(k):
     key_replacements = {

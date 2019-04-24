@@ -15,6 +15,10 @@ Three languages with obsolete Glottocodes have been reassigned here.
 - 2730 Turubul (ER): `yaga1248` -> `yaga1256`
 - 2731 Yagara (ER): `yaga1248` -> `yaga1256`
 
+Other reassignments:
+
+- 2544 Tamang (Dhankuta) (EA): `nucl1729` (the Nuclear Tamang family) -> `east2347` (Eastern Tamang)
+
 ## Search
 
 (With the PHOIBLE 2 release, this is somewhat outdated. It'll be fixed later.)
