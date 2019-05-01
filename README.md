@@ -2,7 +2,7 @@
 
 The scripts in this repo use Python 3 and depend on `sqlite3`.
 
-## Additions to the data
+## Additions
 
 Two languages lacking Glottocodes in the canonical PHOIBLE 2.0 release are given Glottocodes here.
 
@@ -18,6 +18,14 @@ Three languages with obsolete Glottocodes have been reassigned here.
 Other reassignments:
 
 - 2544 Tamang (Dhankuta) (EA): `nucl1729` (the Nuclear Tamang family) -> `east2347` (Eastern Tamang)
+
+Reassignments that I'll get around to the next time I update the Pshrimp DB:
+
+- 1017 Sesotho (PH): `siss1243` (Sissano) -> `sout2807` (Southern Sotho)
+
+## Omissions
+
+UPSID 'pipe' segments are assumed to be their second element. In practice, this means dental/alveolar segments are assumed to be alveolar.
 
 ## Search
 
