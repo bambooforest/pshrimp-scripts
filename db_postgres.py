@@ -16,7 +16,7 @@ languages (                                 \
     iso6393 VARCHAR(255),                   \
     family VARCHAR(255),                    \
     genus VARCHAR(255),                     \
-    area VARCHAR(255),                      \
+    macroarea VARCHAR(255),                 \
     latitude FLOAT,                         \
     longitude FLOAT                         \
 )

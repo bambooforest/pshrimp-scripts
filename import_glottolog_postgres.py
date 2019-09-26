@@ -51,7 +51,7 @@ def data(glottocode):
 		'iso6393': iso6393, 
 		'family': family, 
 		'genus': genus, 
-		'area': area.name
+		'macroarea': area.name
 	})
 
 
